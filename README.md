@@ -1,2 +1,2 @@
-template
-![status](https://github.com/Pacan4ik/spring-template/actions/workflows/module1.yml/badge.svg)
+![status](https://github.com/Pacan4ik/tododo-pet/actions/workflows/module1.yml/badge.svg)
+
