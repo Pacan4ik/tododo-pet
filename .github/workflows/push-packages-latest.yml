@@ -1,0 +1,40 @@
+name: Push packages with tag :latest
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build
+    permissions:
+      packages: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: maven package
+#                     !!!
+        run: mvn -pl module1 -am package
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push to the registry
+        run: |
+          REPO_OWNER_LOWER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+#         change module name
+          DOCKER_TAG=ghcr.io/$REPO_OWNER_LOWER/module1:latest
+          docker build -t $DOCKER_TAG -f module1.Dockerfile .
+          docker push $DOCKER_TAG
